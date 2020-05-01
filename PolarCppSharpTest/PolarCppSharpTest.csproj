@@ -8,9 +8,9 @@
         <OutputPath>bin/Debug</OutputPath>
     </PropertyGroup>
 
-    <ItemGroup Condition="Exists('/etc/passwd')">
+    <PropertyGroup Condition="Exists('/etc/passwd')">
         <DefineConstants>LINUX</DefineConstants>
-    </ItemGroup>
+    </PropertyGroup>
     
     <ItemGroup>
       <None Remove="CppAPI\Interop" />
