@@ -57,6 +57,31 @@ def generate(output_dir, platform, arch, files)
   end
 end
 
+def getTestClass(file)
+  content = File.read(file)
+  content.match(/public unsafe partial class Test(\s*[^}])*}/).to_s
+end
+
+def replaceTestClass(file, new_content)
+  content = File.read(file)
+  content.sub!(/public unsafe partial class Test(\s*[^}])*}/, new_content)
+  writeFile(file, content);
+end
+
+def fixTestClass(file)
+  content = getTestClass(file)
+  content = content.sub("FieldOffset(32)", "FieldOffset(40)")
+                   .sub("FieldOffset(64)", "FieldOffset(80)")
+                   .sub("FieldOffset(96)", "FieldOffset(120)")
+  replaceTestClass(file, content)
+end
+
+# only for windows
+task :fix => ["Generated/#{build_platform}/x64/ALK.cs"] do 
+  fixTestClass("Generated/#{build_platform}/x64/ALK.cs")
+  puts getTestClass("Generated/#{build_platform}/x64/ALK.cs")
+end
+
 def gencmd(output_dir, platform, arch, files)
 
     vector_holder_path = File.expand_path("CppAPI/Interop/VectorHolder.hpp")
