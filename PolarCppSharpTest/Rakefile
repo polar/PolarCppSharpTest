@@ -99,7 +99,7 @@ def fixStringVal(platform, file)
   end
 end
 
-def getTestClass(platform, file)
+def getTestClass(file)
   content = File.read(file)
   content.match(/public unsafe partial class Test(\s*[^}])*}/).to_s
 end
@@ -202,8 +202,8 @@ end
 
 library = build_platform == "linux" ? "bin/Debug/netcoreapp3.1/libALK.so" : "bin/Debug/netcoreapp3.1/ALK.dll"
 
-task :install => [library]
+task :compile => [library]
 
-task :run => [:install] do
+task :run => [:compile] do
   sh "dotnet run"
 end
