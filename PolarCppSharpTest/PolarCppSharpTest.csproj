@@ -6,18 +6,14 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <OutputPath>bin/Debug</OutputPath>
-        <DefineConstants>LINUX</DefineConstants>
     </PropertyGroup>
 
+    <ItemGroup Condition="Exists('/etc/passwd')">
+        <DefineConstants>LINUX</DefineConstants>
+    </ItemGroup>
+    
     <ItemGroup>
       <None Remove="CppAPI\Interop" />
     </ItemGroup>
-
-    <ItemGroup>
-        <ClCompile Include="CppAPI\Interop\ByteVectorHolder.cpp" />
-      <ClCompile Include="CppAPI\Interop\StringOptional.cpp" />
-      <ClCompile Include="CppAPI\Test.cpp" />
-    </ItemGroup>
-
-
+    
 </Project>
