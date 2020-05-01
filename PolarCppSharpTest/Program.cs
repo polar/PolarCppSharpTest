@@ -11,7 +11,7 @@ namespace PolarCppSharpTest
     {
         static unsafe void Main(string[] args)
         {
-            Test test = Test.getTest();
+            Test test = Test.getStaticTest();
             Console.WriteLine("************** C++ *************");
             test.print();
             Console.WriteLine("************** C# *************");

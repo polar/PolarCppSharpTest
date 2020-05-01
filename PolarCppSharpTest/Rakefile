@@ -36,28 +36,70 @@ end
 def generate(output_dir, platform, arch, files)
   dest = "#{output_dir}/#{platform}/#{arch}"
   sh gencmd(output_dir, platform, arch, files)
-  # We need to massage the resultant files.
-  # The #include directives have full paths in them, and we need to make them relative to its directory.
-  # We'll just do it in memory. The Std.cs and symbols.cpp files aren't that large.
+end
+
+def fixBasicString(platform, file)
+  puts "Fixing std.basic_string.data"
+  content = File.read(file)
   if platform == "linux"
-    # This symbol comes up wrong for linux ABI some reason. Easy enough, we just change it.
-    # TODO:: Find out why generated basic_string symbol is wrong.
-    symbols = File.open("#{dest}/Std.cs").read.gsub("_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE4dataEv",
-                                                    "_ZNKSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE4dataEv")
-    writeFile("#{dest}/Std.cs", symbols)
+    content.sub!("_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE4dataEv",
+                 "_ZNKSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE4dataEv")
   else
-    # This symbol comes up wrong for linux ABI some reason. Easy enough, we just change it.
-    # TODO:: Find out why generated data@?$basic_string symbol is wrong.
-    symbols = File.open("#{dest}/Std.cs").read.gsub("?data@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEAAPEADXZ",
-                                                    "?data@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEBAPEBDXZ")
-    # Other corrections!
-    symbols = symbols.sub(/namespace _Vector_val[\s][^}]*}\s*}/, File.read("Template/Vector_val.cs.in"))
-    symbols = symbols.sub(/namespace _String_val[\s][^}]*}[^}]*}\s*}\s*}/, File.read("Template/String_val.cs.in"))
-    writeFile("#{dest}/Std.cs", symbols)
+    content.sub!("?data@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEAAPEADXZ",
+                 "?data@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEBAPEBDXZ")
+  end
+  writeFile(file, content)
+  true
+end
+
+task :fix_basic_string => ["Generated/#{build_platform}/#{build_arch}/ALK.cs"] do 
+  fixed = fixBasicString(build_platform, "Generated/#{build_platform}/#{build_arch}/Std.cs")
+  if fixed 
+      puts "File std.basic_string.data: done."
+  else
+      puts "No std.basic_string.data fix needed."
   end
 end
 
-def getTestClass(file)
+def fixVectorVal(platform, file)
+  if platform == "win"
+      content = File.read(file)
+      content = content.sub(/namespace _Vector_val[\s][^}]*}\s*}/, File.read("Template/Vector_val.cs.in"))
+      writeFile(file, content)
+      true
+  end
+end
+
+task :fix_vector_val => ["Generated/#{build_platform}/#{build_arch}/ALK.cs"] do 
+  puts "Fixing std._Vector_val"
+  fixed = fixVectorVal(build_platform, "Generated/#{build_platform}/#{build_arch}/Std.cs")
+  if fixed 
+      puts "File Vector_val: done."
+  else
+      puts "No Vector_val fix needed."
+  end
+end
+
+task :fix_string_val => ["Generated/#{build_platform}/#{build_arch}/ALK.cs"] do 
+  puts "Fixing std._String_val"
+  fixed = fixStringVal(build_platform, "Generated/#{build_platform}/#{build_arch}/Std.cs")
+  if fixed 
+      puts "File String_val: done."
+  else
+      puts "No String_val fix needed: Linux"
+  end
+end
+
+def fixStringVal(platform, file)
+  if platform == "win"
+      content = File.read(file)
+      content.sub!(/namespace _Vector_val[\s][^}]*}\s*}/, File.read("Template/Vector_val.cs.in"))
+      writeFile(file, content)
+      true
+  end
+end
+
+def getTestClass(platform, file)
   content = File.read(file)
   content.match(/public unsafe partial class Test(\s*[^}])*}/).to_s
 end
@@ -68,22 +110,31 @@ def replaceTestClass(file, new_content)
   writeFile(file, content);
 end
 
-def fixTestClass(file)
-  content = getTestClass(file)
-  content = content.sub("FieldOffset(32)", "FieldOffset(40)")
-                   .sub("FieldOffset(64)", "FieldOffset(80)")
-                   .sub("FieldOffset(96)", "FieldOffset(120)")
-  replaceTestClass(file, content)
+def fixTestClass(platform, file)
+  if platform == "win"
+      content = getTestClass(file)
+      content = content.sub("FieldOffset(32)", "FieldOffset(40)")
+                       .sub("FieldOffset(64)", "FieldOffset(80)")
+                       .sub("FieldOffset(96)", "FieldOffset(120)")
+      replaceTestClass(file, content)
+      true
+  end
 end
 
 # only for windows
-task :fix => ["Generated/#{build_platform}/x64/ALK.cs"] do 
-  fixTestClass("Generated/#{build_platform}/x64/ALK.cs")
-  puts getTestClass("Generated/#{build_platform}/x64/ALK.cs")
+task :fix_test_class => ["Generated/#{build_platform}/#{build_arch}/ALK.cs"] do 
+  puts "Fixing Test class Field Offsets"
+  fixed = fixTestClass(build_platform, "Generated/#{build_platform}/#{build_arch}/ALK.cs")
+  if fixed 
+      puts "File Test Class FieldOffsets: done."
+  else
+      puts "No String_val fix needed."
+  end
 end
 
-def gencmd(output_dir, platform, arch, files)
+task :fix => [:fix_basic_string, :fix_vector_val, :fix_string_val, :fix_test_class]
 
+def gencmd(output_dir, platform, arch, files)
     vector_holder_path = File.expand_path("CppAPI/Interop/VectorHolder.hpp")
     optional_path = File.expand_path("CppAPI/Interop/Optional.hpp")
     
@@ -113,24 +164,24 @@ end
 desc "Generates the ALK.Interop.cs file and the symbols"
 task :generate => ["Generated", "Generated/#{build_platform}/#{build_arch}/ALK.cs"]
 
-task :gen => [:generate]
+task :gen => [:generate, :fix_basic_string, :fix_string_val, :fix_vector_val, :fix_test_class]
 
 task :clean do
   rm_rf "cmake-#{build_platform}-build"
   rm_rf "Generated"
 end
 
-task :regen => [:clean, :generate]
+task :regen => [:clean, :gen]
 
 directory("cmake-#{build_platform}-build")
 
-file "cmake-linux-build/CMakeCache.txt" => ["cmake-linux-build", "CMakeLists.txt", "Generated/linux/x64/ALK.cs"] do
+file "cmake-linux-build/CMakeCache.txt" => ["cmake-linux-build", "CMakeLists.txt", "Generated/linux/#{build_arch}/ALK.cs"] do
   Dir.chdir("cmake-linux-build") do
     sh "cmake .."
   end
 end
 
-file "cmake-win-build/CMakeCache.txt" => ["cmake-win-build", "CMakeLists.txt", "Generated/win/x64/ALK.cs"] do
+file "cmake-win-build/CMakeCache.txt" => ["cmake-win-build", "CMakeLists.txt", "Generated/win/#{build_arch}/ALK.cs"] do
   Dir.chdir("cmake-win-build") do
     # If it's not already built we build Debug.
     sh "cmake -GNinja .."
