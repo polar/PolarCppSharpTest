@@ -99,13 +99,13 @@ task :regen => [:clean, :generate]
 
 directory("cmake-#{build_platform}-build")
 
-file "cmake-linux-build/CMakeCache.txt" => ["cmake-linux-build", "CMakeLists.txt"] do
+file "cmake-linux-build/CMakeCache.txt" => ["cmake-linux-build", "CMakeLists.txt", "Generated/linux/x64/ALK.cs"] do
   Dir.chdir("cmake-linux-build") do
     sh "cmake .."
   end
 end
 
-file "cmake-win-build/CMakeCache.txt" => ["cmake-win-build", "CMakeLists.txt"] do
+file "cmake-win-build/CMakeCache.txt" => ["cmake-win-build", "CMakeLists.txt", "Generated/win/x64/ALK.cs"] do
   Dir.chdir("cmake-win-build") do
     # If it's not already built we build Debug.
     sh "cmake -GNinja .."

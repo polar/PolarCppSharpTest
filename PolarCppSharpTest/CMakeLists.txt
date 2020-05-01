@@ -9,9 +9,12 @@ elseif(WIN32)
 endif()
 
 add_library(ALK SHARED 
+     CppAPI/Interop/ByteVectorHolder.cpp
+     CppAPI/Interop/StringOptional.cpp
      Generated/${PLATFORM}/x64/ALK-symbols.cpp 
      CppAPI/Test.cpp
      )
+
      
 add_library(Std-symbols SHARED 
      Generated/${PLATFORM}/x64/Std-symbols.cpp
