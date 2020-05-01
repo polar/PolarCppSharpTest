@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
 project(PolarCppSharpTest)
 
+set(CMAKE_CXX_STANDARD 14)
+
 if (UNIX)
   set(PLATFORM linux)
   set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -D__GLIBCXX_USE_CXX11_ABI=1)
