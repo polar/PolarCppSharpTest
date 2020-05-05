@@ -22,6 +22,8 @@ add_library(ALK SHARED
 add_library(Std-symbols SHARED 
      Generated/${PLATFORM}/x64/ALK/Std-symbols.cpp
      )
+# Ugg, needed for windows? 
+target_link_libraries(Std-symbols PRIVATE ALK)
 
 # Install up so that the libraries get placed in the executable directory.
 
