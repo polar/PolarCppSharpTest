@@ -39,4 +39,4 @@ install(TARGETS Std-symbols
                 Libraries)
 
 add_executable(main CppAPI/Main.cpp)
-target_link_libraries(main PRIVATE ALK)
+target_link_libraries(main PRIVATE ALK Std-symbols)
