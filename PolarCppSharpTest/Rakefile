@@ -87,8 +87,15 @@ def generate(output_dir, platform, arch, config, files)
     # This symbol comes up wrong for linux ABI some reason. Easy enough, we just change it.
     # TODO:: Find out why generated basic_string symbol is wrong.
     symbols = File.open("#{dest}/ALK/Std.cs").read.gsub("_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE4dataEv",
-                                                    "_ZNKSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE4dataEv")
+                                                        "_ZNKSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE4dataEv")
     writeFile("#{dest}/ALK/Std.cs", symbols)
+  else
+    symbols = File.open("#{dest}/ALK/Std.cs").read.gsub("?data@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEAAPEADXZ",
+                                                        "?data@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEBAPEBDXZ")
+    # Other corrections!
+    #symbols = symbols.sub(/namespace _Vector_val[\s][^}]*}\s*}/, File.read("Template/Vector_val.cs"))
+    #symbols = symbols.sub(/namespace _String_val[\s][^}]*}[^}]*}\s*}\s*}/, File.read("Template/String_val.cs"))
+    #writeFile("#{dest}/ALK/Std.cs", symbols)
   end
 end
 
