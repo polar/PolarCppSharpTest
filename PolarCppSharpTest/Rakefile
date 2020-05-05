@@ -187,7 +187,7 @@ def gencmd(output_dir, platform, arch, debug_release, files)
     #
     dest = "#{output_dir}/#{platform}/#{arch}/ALK"
     cmd = "#{cpp_sharp_cli} "
-    cmd << "--A=\"#{cflags}\""
+    cmd << "--A=\"#{cflags}\" "
     cmd << "--p=#{platform} --a=#{arch} "
     cmd << "--on=ALK "                                             # Output namespace
     cmd << "--ON=Interop::Optional --O=#{optional_path} "          # Name and path of class Optional
