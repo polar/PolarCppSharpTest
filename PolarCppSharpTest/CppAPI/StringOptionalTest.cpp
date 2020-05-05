@@ -31,6 +31,6 @@ Interop::StringOptional &StringOptionalTest::getStaticStringOptionalWithValue()
 
 Interop::StringOptional &StringOptionalTest::getStaticStringOptional()
 {
-printf("staticOptinalWithNoValue : %lx\n", &staticOptionalWithNoValue);
+printf("staticOptinalWithNoValue : %p\n", (void *) &staticOptionalWithNoValue);
     return staticOptionalWithNoValue;
 }

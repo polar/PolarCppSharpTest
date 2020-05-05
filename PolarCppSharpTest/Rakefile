@@ -92,10 +92,7 @@ def generate(output_dir, platform, arch, config, files)
   else
     symbols = File.open("#{dest}/ALK/Std.cs").read.gsub("?data@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEAAPEADXZ",
                                                         "?data@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEBAPEBDXZ")
-    # Other corrections!
-    #symbols = symbols.sub(/namespace _Vector_val[\s][^}]*}\s*}/, File.read("Template/Vector_val.cs"))
-    #symbols = symbols.sub(/namespace _String_val[\s][^}]*}[^}]*}\s*}\s*}/, File.read("Template/String_val.cs"))
-    #writeFile("#{dest}/ALK/Std.cs", symbols)
+    writeFile("#{dest}/ALK/Std.cs", symbols)
   end
 end
 
