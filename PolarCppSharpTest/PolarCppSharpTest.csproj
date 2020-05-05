@@ -7,13 +7,24 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <OutputPath>bin/Debug</OutputPath>
     </PropertyGroup>
-
     <PropertyGroup Condition="Exists('/etc/passwd')">
         <DefineConstants>LINUX</DefineConstants>
     </PropertyGroup>
+
+    <ItemGroup Condition="Exists('/etc/passwd')">
+        <Compile Remove="Generated\win\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition="!Exists('/etc/passwd')">
+        <Compile Remove="Generated\linux\**\*.cs" />
+    </ItemGroup>
     
     <ItemGroup>
       <None Remove="CppAPI\Interop" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <ClCompile Include="CppAPI\StringOptionalTest.cpp" />
     </ItemGroup>
     
 </Project>

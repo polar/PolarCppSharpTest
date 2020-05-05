@@ -50,6 +50,7 @@
   void Test::print()
   {
       std::cout << "Test is at    " << (void *) addr() << " : " << addr() << std::endl;
+      std::cout << "Test: sizeof(std::string): " << sizeof(std::string) << ", sizeof(Test): " << sizeof(Test) << std::endl;
       std::cout << "Test:item1 at " << (void *) aItem1() << " : " << aItem1() << " at " << oItem1() << " is '" << item1 << "'" << std::endl;
       std::cout << "Test:item2 at " << (void *) aItem2() << " : " << aItem2() << " at " << oItem2() << " is '" << item2 << "'" << std::endl;
       std::cout << "Test:item3 at " << (void *) aItem3() << " : " << aItem3() << " at " << oItem3() << " is '" << item3 << "'" << std::endl;
@@ -73,4 +74,16 @@
   {
     std::cout << "Test::CopyConstructor on " << (void *) t.addr() << " : " << t.addr()
               << " ==> " << (void *) addr() << " : " << addr() << std::endl;
+  }
+  
+  std::string Test::returnString(int x)
+  {
+    switch(x)
+    {
+        case 1: return item1;
+        case 2: return item2;
+        case 3: return item3;
+        case 4: return item4;
+        default: return "wrong";
+    }
   }

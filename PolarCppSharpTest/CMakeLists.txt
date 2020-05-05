@@ -13,13 +13,14 @@ endif()
 add_library(ALK SHARED 
      CppAPI/Interop/ByteVectorHolder.cpp
      CppAPI/Interop/StringOptional.cpp
-     Generated/${PLATFORM}/x64/ALK-symbols.cpp 
+     Generated/${PLATFORM}/x64/ALK/ALK-symbols.cpp 
+     CppAPI/StringOptionalTest.cpp
      CppAPI/Test.cpp
      )
 
      
 add_library(Std-symbols SHARED 
-     Generated/${PLATFORM}/x64/Std-symbols.cpp
+     Generated/${PLATFORM}/x64/ALK/Std-symbols.cpp
      )
 
 # Install up so that the libraries get placed in the executable directory.
@@ -36,3 +37,6 @@ install(TARGETS Std-symbols
                 bin/Debug/netcoreapp3.1
                 COMPONENT
                 Libraries)
+
+add_executable(main CppAPI/Main.cpp)
+target_link_libraries(main PRIVATE ALK)
